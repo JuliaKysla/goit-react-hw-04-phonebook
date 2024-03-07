@@ -1,5 +1,12 @@
 import styled from 'styled-components';
 
+export const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  margin: 0 auto;
+`;
+
 export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -27,4 +34,11 @@ export const Item = styled.li`
 export const Button = styled.button`
   display: block;
   padding: 2px 12px;
+`;
+
+export const Input = styled.input`
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
 `;

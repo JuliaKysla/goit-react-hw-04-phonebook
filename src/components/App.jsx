@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import ContactForm from './ContactForm';
 import Filter from './Filter';
@@ -6,91 +6,69 @@ import ContactList from './ContactList';
 import Notification from './Notification';
 import { Wrapper } from '../styles/Styles';
 
-export class App extends Component {
-  state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
+const Data = [
+  { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+  { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+  { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+  { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+];
 
-    filter: '',
+
+export const App = () => {
+    const [contacts, setContacts] = useState(()=> {return JSON.parse(window.localStorage.getItem('contacts')) ?? Data;});
+ const [filter, setFilter] = useState('');
+
+ useEffect(() => {
+  localStorage.setItem('contacts', JSON.stringify(contacts));
+}, [contacts]);
+
+  const handleChangeFilter = e => {
+    setFilter(e.target.value);
   };
 
-
-  componentDidMount() {
-    const contacts = JSON.parse(window.localStorage.getItem('contacts'));
-    if (contacts?.length) {
-      this.setState({ contacts });
-    }
-  }
-  componentDidUpdate(_, prevState) {
-    if (prevState.contacts !== this.state.contacts) {
-      window.localStorage.setItem(
-        'contacts',
-        JSON.stringify(this.state.contacts)
-      );
-    }
-  }
-
-  handleChangeFilter = e => {
-    this.setState({ filter: e.target.value });
-  };
-
-  handleAddContact = contactData => {
-    const { contacts } = this.state;
+  const handleAddContact = (name, number) => {
     const nameExists = contacts.find(
       contact =>
         contact.name.toLocaleLowerCase().trim() ===
-        contactData.name.toLocaleLowerCase().trim()
+        name.toLocaleLowerCase().trim()
     );
 
     if (nameExists) {
-      alert(`${contactData.name} is already in your contacts.`);
+      alert(`Contact is already in your contacts.`);
     } else {
-      const newContact = { id: nanoid(), ...contactData };
-      this.setState(prevState => ({
-        contacts: [...prevState.contacts, newContact],
-      }));
+      const newContact = { id: nanoid(), name, number};
+      setContacts(prevContacts =>  [...prevContacts, newContact],
+      )};
     }
-  };
 
-  handleContactFilter = () => {
-    const { contacts, filter } = this.state;
-    return contacts.filter(
+  const handleContactFilter = () => { contacts.filter(
       contact =>
         contact.name.toLowerCase().includes(filter.toLowerCase()) ||
         contact.number.includes(filter)
-    );
-  };
+    );}
 
-  handleDeleteContact = id => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.id !== id),
-    }));
-  };
+  const handleDeleteContact = id => {
+    setContacts(prevContacts =>
+       prevContacts.filter(contact => contact.id !== id),
+    )};
 
-  render() {
-    const { contacts } = this.state;
-    const handleContactFilter = this.handleContactFilter();
     return (
       <>
         <Wrapper>
           <h1>Phonebook</h1>
-          <ContactForm addContact={this.handleAddContact} />
+          <ContactForm addContact={handleAddContact} />
           <h2>Contacts List</h2>
-          <Filter filteredContacts={this.handleChangeFilter} />
+          <Filter filteredContacts={handleChangeFilter} />
           {contacts.length ? (
             <ContactList
               list={handleContactFilter}
-              onDeleteContact={this.handleDeleteContact}
+              onDeleteContact={handleDeleteContact}
             />
           ) : (
-            <Notification message="Your contact list is empty! Put new name" />
+            <Notification message="Your contact list is empty" />
           )}
         </Wrapper>
       </>
     );
-  }
-}
+
+          };

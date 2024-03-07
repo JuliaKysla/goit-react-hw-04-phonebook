@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Filter = ({ filteredContacts }) => {
+const Filter = ({ value, filteredContacts }) => {
   return (
     <input
+    value={value}
       name="filter"
       onChange={filteredContacts}
       placeholder="Find contact by name"
